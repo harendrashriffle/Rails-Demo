@@ -12,16 +12,16 @@
 
 ActiveRecord::Schema[7.0].define(version: 2023_08_16_125125) do
   create_table "comments", force: :cascade do |t|
-    t.string "username"
-    t.text "body"
+    t.text "content"
+    t.integer "user_id", null: false
     t.integer "post_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["post_id"], name: "index_comments_on_post_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
   create_table "followers", force: :cascade do |t|
-    t.string "username"
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -29,18 +29,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_16_125125) do
   end
 
   create_table "likes", force: :cascade do |t|
-    t.string "username"
     t.boolean "interest"
+    t.integer "user_id", null: false
     t.integer "post_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["post_id"], name: "index_likes_on_post_id"
+    t.index ["user_id"], name: "index_likes_on_user_id"
   end
 
   create_table "posts", force: :cascade do |t|
-    t.string "title"
-    t.text "caption"
-    t.string "picture"
+    t.text "content"
+    t.boolean "picture"
     t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -49,21 +49,24 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_16_125125) do
 
   create_table "user_profile_pictures", force: :cascade do |t|
     t.boolean "profile_picture"
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_user_profile_pictures_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "username"
+    t.string "name"
+    t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   add_foreign_key "comments", "posts"
+  add_foreign_key "comments", "users"
   add_foreign_key "followers", "users"
   add_foreign_key "likes", "posts"
+  add_foreign_key "likes", "users"
   add_foreign_key "posts", "users"
   add_foreign_key "user_profile_pictures", "users"
 end
