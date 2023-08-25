@@ -1,5 +1,6 @@
 require "prawn"
 class UsersController < ApplicationController
+  skip_before_action :authenticate_request, only: [:create, :user_login]
   # http_basic_authenticate_with name: "H", password: "1"
   # USERS = { "H" => "1" }
   # before_action :authenticate
@@ -8,7 +9,7 @@ class UsersController < ApplicationController
 
 
   def user_login
-    if user=User.find_by(email: params[:email], password: params[:password])
+    if user=User.find_by(email: params[:email], password_digest: params[:password])
       token= jwt_encode(user_id: user.id)
       render json: { message: "Logged In Successfully..", token: token }
     else
@@ -68,11 +69,11 @@ class UsersController < ApplicationController
 
   private
     def set_params
-      params.permit(:name,:email)
+      params.permit(:name,:email,:password_digest)
     end
 
     def update_params
-      params.permit(:name,:email)
+      params.permit(:name,:email,:password_digest)
     end
 
 

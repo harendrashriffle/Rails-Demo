@@ -1,5 +1,9 @@
 class CommentsController < ApplicationController
   protect_from_forgery
+
+  def index
+    @comment =
+  end
   def create
     @comment = Comment.new(set_params)
 
