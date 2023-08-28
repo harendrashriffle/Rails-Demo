@@ -1,63 +1,63 @@
-class CommentsController < ApplicationController
-  protect_from_forgery
+class LikesController < ApplicationController
+    protect_from_forgery
 
 #--------------------------------INDEX------------------------------------------
 
   def index
-    @comment = Comment.all
+    @like = Like.all
   end
 
 #---------------------------------NEW-------------------------------------------
 
   def new
-    @comment = Comment.new
+    @like = Like.new
   end
 
 #--------------------------------CREATE-----------------------------------------
 
   def create
-    @comment = Comment.new(set_params)
+    @like = Like.new(set_params)
 
-    if @comment.save
-      render json: {message:"Comment Created", data: @comment}
+    if @like.save
+      render json: {message:"You likes", data: @like}
     else
-      render json: {errors: @comment.errors.full_message}
+      render json: {errors: @like.errors.full_message}
     end
   end
 
 #---------------------------------SHOW------------------------------------------
 
   def show
-    render json: Comment.find(params[:id])
+    render json: Like.find(params[:id])
   end
 
 #--------------------------------UPDATE-----------------------------------------
 
   def update
-    @comment = Comment.find(params[:id])
+    @like = Like.find(params[:id])
 
-    if @comment.update(update_params)
-      render json: {message:"Updated Comment", data: @comment}
+    if @like.update(update_params)
+      render json: {message:"Updated like", data: @like}
     else
-      render json: {errors: @comment.errors.full_message}
+      render json: {errors: @like.errors.full_message}
     end
   end
 
 #--------------------------------DELETE-----------------------------------------
 
   def delete
-    @comment.destroy
-    render json: {message: "This comment deleted succesfully"}
+    @like.destroy
+    render json: {message: "This like deleted succesfully"}
   end
 
 #----------------------------PRIVATE METHOD-------------------------------------
 
   private
   def set_params
-    params.permit(:content,:post_id,:user_id)
+    params.permit(:expression,:post_id,:user_id)
   end
 
   def update_params
-    params.permit(:content,:post_id,:user_id)
+    params.permit(:expression,:post_id,:user_id)
   end
 end

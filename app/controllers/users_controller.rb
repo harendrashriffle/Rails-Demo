@@ -1,15 +1,14 @@
 require "prawn"
 class UsersController < ApplicationController
+
   skip_before_action :authenticate_request, only: [:create, :user_login]
-  # http_basic_authenticate_with name: "H", password: "1"
-  # USERS = { "H" => "1" }
-  # before_action :authenticate
 
   protect_from_forgery
 
+#-----------------------------USER LOGIN----------------------------------------
 
   def user_login
-    if user=User.find_by(email: params[:email], password_digest: params[:password])
+    if user=User.find_by(email: params[:email], password_digest: params[:password_digest])
       token= jwt_encode(user_id: user.id)
       render json: { message: "Logged In Successfully..", token: token }
     else
@@ -17,20 +16,26 @@ class UsersController < ApplicationController
     end
   end
 
-  def index
-    @user = User.all
+#--------------------------------INDEX------------------------------------------
 
-    if @user.present?
-      # render json: User.all.to_json(only: [:email, :name])
-      render json: User.all
-    else
-      render json: {message: "No Users Present"}
-    end
-  end
+  # def index
+  #   @user = User.all
 
-  def new
-    @user = User.new
-  end
+  #   if @user.present?
+  #     # render json: User.all.to_json(only: [:email, :name])
+  #     render json: User.all
+  #   else
+  #     render json: {message: "No Users Present"}
+  #   end
+  # end
+
+#---------------------------------NEW-------------------------------------------
+
+  # def new
+  #   @user = User.new
+  # end
+
+#--------------------------------CREATE-----------------------------------------
 
   def create
     @user = User.new(set_params)
@@ -42,9 +47,13 @@ class UsersController < ApplicationController
     end
   end
 
+#---------------------------------SHOW------------------------------------------
+
   def show
-    render json: User.find(params[:id])
+    render json: {current_user:@current_user, current_user_post:@current_user.posts.all}
   end
+
+#--------------------------------UPDATE-----------------------------------------
 
   def update
     @user = User.find(params[:id])
@@ -56,16 +65,30 @@ class UsersController < ApplicationController
     end
   end
 
+#--------------------------------DELETE-----------------------------------------
+
   def delete
-    @user.destroy
-    render json: {message: "User deleted succesfully"}
+    @current_user.destroy
+    render json: {message: "User Account deleted succesfully"}
   end
 
+#--------------------------FOLLOW AND UNFOLLOW----------------------------------
 
-  def download_pdf
-    user = User.find(params[:id])
-    send_data generate_pdf(user),filename: "#{user.name}.pdf",type: "application/pdf"
-  end
+def follow
+  @user = User.find(params[:id])
+  current_user.followees << @user
+  redirect_back(fallback_location: users_posts(@user))
+end
+
+def unfollow
+  @user = User.find(params[:id])
+  current_user.followed_users.find_by(followee_id: @user.id).destroy
+  redirect_back(fallback_location: users_posts(@user))
+end
+
+
+
+#----------------------------PRIVATE METHOD-------------------------------------
 
   private
     def set_params
@@ -76,20 +99,4 @@ class UsersController < ApplicationController
       params.permit(:name,:email,:password_digest)
     end
 
-
-  private
-    def generate_pdf(user)
-      Prawn::Document.new do
-        text user.name, align: :center
-        text "Email: #{user.email}"
-      end.render
-    end
-
-
-  # private
-  #   def authenticate
-  #     authenticate_or_request_with_http_digest do |username|
-  #       USERS[username]
-  #     end
-  #   end
 end

@@ -2,19 +2,26 @@ class PostsController < ApplicationController
 
   protect_from_forgery
 
+#--------------------------------INDEX------------------------------------------
+
   def index
-    @post = Post.all
+    render json: {message: "Here is your post", data:@current_user.posts.all}
+    # @post = Post.find(params[:user_id])
 
-    if @post.present?
-      render json: Post.all
-    else
-      render json: {message: "No Posts Present"}
-    end
+    # if @post.present?
+    #   render json: Post.all
+    # else
+    #   render json: {message: "No Posts Present"}
+    # end
   end
 
-  def new
-    @post = Post.new
-  end
+#---------------------------------NEW-------------------------------------------
+
+  # def new
+  #   @post = Post.new
+  # end
+
+#--------------------------------CREATE-----------------------------------------
 
   def create
     @post = Post.new(set_params)
@@ -26,9 +33,14 @@ class PostsController < ApplicationController
     end
   end
 
+#---------------------------------SHOW------------------------------------------
+
   def show
-    render json: Post.find(params[:user_id])
+    # render json: Post.find(params[:user_id])
+    render json: @current_user.posts.all
   end
+
+#--------------------------------UPDATE-----------------------------------------
 
   def update
     @post = Post.find(params[:id])
@@ -40,16 +52,19 @@ class PostsController < ApplicationController
     end
   end
 
+#--------------------------------DELETE-----------------------------------------
+
   def delete
     @post.destroy
     render json: {message: "This post deleted succesfully"}
   end
 
+#----------------------------PRIVATE METHOD-------------------------------------
+
   private
   def set_params
     params.permit(:content,:picture,:user_id)
   end
-
 
   def update_params
     params.permit(:content,:picture,:user_id)

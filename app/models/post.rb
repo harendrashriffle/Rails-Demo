@@ -5,8 +5,4 @@ class Post < ApplicationRecord
 
   validates :content, presence: true
   validates :picture, presence: true
-
-  # def check
-  #   if content.nil? == false || if picture.nil? == false
-  # end
 end
