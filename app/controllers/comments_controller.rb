@@ -9,9 +9,9 @@ class CommentsController < ApplicationController
 
 #---------------------------------NEW-------------------------------------------
 
-  def new
-    @comment = Comment.new
-  end
+  # def new
+  #   @comment = Comment.new
+  # end
 
 #--------------------------------CREATE-----------------------------------------
 
@@ -45,7 +45,8 @@ class CommentsController < ApplicationController
 
 #--------------------------------DELETE-----------------------------------------
 
-  def delete
+  def destroy
+    @comment = @current_user.comments.find(params[:id])
     @comment.destroy
     render json: {message: "This comment deleted succesfully"}
   end

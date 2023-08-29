@@ -50,43 +50,56 @@ class UsersController < ApplicationController
 #---------------------------------SHOW------------------------------------------
 
   def show
-    render json: {current_user:@current_user, current_user_post:@current_user.posts.all}
+    render json: @current_user
   end
 
 #--------------------------------UPDATE-----------------------------------------
 
   def update
-    @user = User.find(params[:id])
-
-    if @user.update(update_params)
-      render json: {message:"UpdatedUser", data: @user}
+    if @current_user.update(update_params)
+      render json: { message: "User profile updated", data: @current_user }
     else
-      render json: {errors: @user.errors.full_message}
+      render json: { errors: @current_user.errors.full_messages }
     end
   end
 
 #--------------------------------DELETE-----------------------------------------
 
-  def delete
-    @current_user.destroy
+  def destroy
+    # user = User.delete(@current_user.id)
+    @current_user.delete
     render json: {message: "User Account deleted succesfully"}
   end
 
 #--------------------------FOLLOW AND UNFOLLOW----------------------------------
 
-def follow
-  @user = User.find(params[:id])
-  current_user.followees << @user
-  redirect_back(fallback_location: users_posts(@user))
-end
+  def follow
+    @user = User.find(params[:id])
+    current_user.followees << @user
+    redirect_to(users_path(@current_user))
+  end
 
-def unfollow
-  @user = User.find(params[:id])
-  current_user.followed_users.find_by(followee_id: @user.id).destroy
-  redirect_back(fallback_location: users_posts(@user))
-end
+  def unfollow
+    @user = User.find(params[:id])
+    current_user.followed_users.find_by(followee_id: @user.id).destroy
+    redirect_to(users_path(@current_user))
+  end
 
+#-----------------------FOLLOWERS AND FOLLOWING----------------------------------
 
+ def followers
+    follower_ids = @current_user.followed_users.pluck(:follower_id)
+    followers = User.where(id: follower_ids)
+
+    render json: { message: "Followers of current user", data: followers }
+  end
+
+  def following
+    following_ids = @current_user.followees.pluck(:followee_id)
+    following_users = User.where(id: following_ids)
+
+    render json: { message: "Users followed by current user", data: following_users }
+  end
 
 #----------------------------PRIVATE METHOD-------------------------------------
 

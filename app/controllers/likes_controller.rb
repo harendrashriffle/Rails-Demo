@@ -1,5 +1,5 @@
 class LikesController < ApplicationController
-    protect_from_forgery
+  protect_from_forgery
 
 #--------------------------------INDEX------------------------------------------
 
@@ -9,9 +9,9 @@ class LikesController < ApplicationController
 
 #---------------------------------NEW-------------------------------------------
 
-  def new
-    @like = Like.new
-  end
+  # def new
+  #   @like = Like.new
+  # end
 
 #--------------------------------CREATE-----------------------------------------
 
@@ -34,6 +34,7 @@ class LikesController < ApplicationController
 #--------------------------------UPDATE-----------------------------------------
 
   def update
+    # @like = @current_user.likes.find(params[:id])
     @like = Like.find(params[:id])
 
     if @like.update(update_params)
@@ -45,7 +46,8 @@ class LikesController < ApplicationController
 
 #--------------------------------DELETE-----------------------------------------
 
-  def delete
+  def destroy
+    # @like = @current_user.likes.find(params[:id])
     @like.destroy
     render json: {message: "This like deleted succesfully"}
   end

@@ -5,14 +5,18 @@ class PostsController < ApplicationController
 #--------------------------------INDEX------------------------------------------
 
   def index
-    render json: {message: "Here is your post", data:@current_user.posts.all}
-    # @post = Post.find(params[:user_id])
+    followed_users_ids = @current_user.followees.pluck(:id)
+    post_ids = [@current_user.id] + followed_users_ids
+    posts = Post.where(user_id: post_ids).order(created_at: :desc)
 
-    # if @post.present?
-    #   render json: Post.all
-    # else
-    #   render json: {message: "No Posts Present"}
-    # end
+    posts_with_details = posts.map do |post|
+      {
+        post: post,
+        comments: post.comments,
+        likes: post.likes
+      }
+    end
+    render json: { message: "Here is your and your followings posts", data: posts_with_details }
   end
 
 #---------------------------------NEW-------------------------------------------
@@ -36,9 +40,18 @@ class PostsController < ApplicationController
 #---------------------------------SHOW------------------------------------------
 
   def show
-    # render json: Post.find(params[:user_id])
-    render json: @current_user.posts.all
-  end
+    post_ids = @current_user.id
+    posts = Post.where(user_id: post_ids).order(created_at: :desc)
+    posts_with_details = posts.map do |post|
+      {
+        post: post,
+        comments: post.comments,
+        likes: post.likes
+      }
+    end
+
+  render json: { message: "Here is your posts", data: posts_with_details }
+end
 
 #--------------------------------UPDATE-----------------------------------------
 
@@ -54,9 +67,10 @@ class PostsController < ApplicationController
 
 #--------------------------------DELETE-----------------------------------------
 
-  def delete
+  def destroy
+    @post = @current_user.posts.find(params[:id])
     @post.destroy
-    render json: {message: "This post deleted succesfully"}
+    render json: {message: "Post deleted succesfully"}
   end
 
 #----------------------------PRIVATE METHOD-------------------------------------
