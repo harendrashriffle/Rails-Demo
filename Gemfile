@@ -75,3 +75,4 @@ gem "prawn"
 gem "byebug"
 gem "bcrypt"
 gem "jwt"
+gem 'active_model_serializers'
